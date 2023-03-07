@@ -24,39 +24,31 @@ function init() {
     // read in samples from JSON file
     d3.json(url).then((data => {
 
-        // ----------------------------------
         // POPULATE DROPDOWN MENU WITH IDs 
-        // ----------------------------------
-
-        //  use a forEach to loop over each name in the array data.names to populate dropdowns with IDs
         data.names.forEach((name => {
             var option = idSelect.append("option");
             option.text(name);
-        })); // close forEach
+        }));
 
-        // get the first ID from the list for initial charts as a default
+        // get the first ID from the list for charts
         var initId = idSelect.property("value")
 
         // plot charts with initial ID
         plotCharts(initId);
 
-    })); // close .then()
+    }));
+}
 
-} // close init() function
-
-// create a function to reset divs to prepare for new data
+// create a function to reset divs to prepare for new data load
 function resetData() {
-
-    // ----------------------------------
+    
     // CLEAR THE DATA
-    // ----------------------------------
-
     demographicsTable.html("");
     barChart.html("");
     bubbleChart.html("");
     gaugeChart.html("");
 
-}; // close resetData()
+};
 
 // create a function to read JSON and plot charts
 function plotCharts(id) {
@@ -64,17 +56,15 @@ function plotCharts(id) {
     // read in the JSON data
     d3.json(url).then((data => {
 
-        // ----------------------------------
         // POPULATE DEMOGRAPHICS TABLE
-        // ----------------------------------
 
         // filter the metadata for the ID chosen
         var individualMetadata = data.metadata.filter(participant => participant.id == id)[0];
 
-        // get the wash frequency for gauge chart later
+        // get the wash frequency
         var wfreq = individualMetadata.wfreq;
 
-        // Iterate through each key and value in the metadata
+        // Iterate through each record combination
         Object.entries(individualMetadata).forEach(([key, value]) => {
 
             var newList = demographicsTable.append("ul");
@@ -89,11 +79,9 @@ function plotCharts(id) {
             // add the key value pair from the metadata to the demographics list
             listItem.text(`${key}: ${value}`);
 
-        }); // close forEach
-
-        // --------------------------------------------------
+        });
+        
         // RETRIEVE DATA FOR PLOTTING CHARTS
-        // --------------------------------------------------
 
         // filter the samples for the ID chosen
         var individualSample = data.samples.filter(sample => sample.id == id)[0];
@@ -103,7 +91,7 @@ function plotCharts(id) {
         var otuLabels = [];
         var sampleValues = [];
 
-        // Iterate through each key and value in the sample to retrieve data for plotting
+        // Iterate through each key and value for plotting
         Object.entries(individualSample).forEach(([key, value]) => {
 
             switch (key) {
@@ -119,9 +107,9 @@ function plotCharts(id) {
                     // case
                 default:
                     break;
-            } // close switch statement
+            } 
 
-        }); // close forEach
+        });
 
         // slice and reverse the arrays to get the top 10 values, labels and IDs
         var topOtuIds = otuIds[0].slice(0, 10).reverse();
@@ -131,9 +119,7 @@ function plotCharts(id) {
         // use the map function to store the IDs with "OTU" for labelling y-axis
         var topOtuIdsFormatted = topOtuIds.map(otuID => "OTU " + otuID);
 
-        // ----------------------------------
         // PLOT BAR CHART
-        // ----------------------------------
 
         // create a trace
         var traceBar = {
@@ -177,15 +163,12 @@ function plotCharts(id) {
                 tickfont: { size: 14 }
             }
         }
-
-
+        
         // plot the bar chart to the "bar" div
         Plotly.newPlot("bar", dataBar, layoutBar);
-
-        // ----------------------------------
+        
         // PLOT BUBBLE CHART
-        // ----------------------------------
-
+        
         // create trace
         var traceBub = {
             x: otuIds[0],
@@ -226,10 +209,8 @@ function plotCharts(id) {
         // plot the bubble chat to the appropriate div
         Plotly.newPlot('bubble', dataBub, layoutBub);
 
-        // ----------------------------------
-        // PLOT GAUGE CHART (OPTIONAL)
-        // ----------------------------------
-
+        // PLOT GAUGE CHART - !!!!!!!!!!!!
+        
         // if wfreq has a null value, make it zero for calculating pointer later
         if (wfreq == null) {
             wfreq = 0;
@@ -349,11 +330,11 @@ function plotCharts(id) {
         Plotly.newPlot('gauge', dataGauge, layoutGauge);
 
 
-    })); // close .then function
+    }));
 
-}; // close plotCharts() function
+};
 
-// when there is a change in the dropdown select menu, this function is called with the ID as a parameter
+// when there is a change in the dropdown select menu
 function optionChanged(id) {
 
     // reset the data
